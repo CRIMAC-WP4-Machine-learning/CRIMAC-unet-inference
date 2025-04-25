@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ConfigFiles context="Korona">
+   <parameter name="ModuleConfiguration" ref="CfsDirectory">CW.cds</parameter>
+   <parameter name="Categorization"/>
+   <parameter name="HorizontalTransducerOffsets"/>
+   <parameter name="VerticalTransducerOffsets"/>
+   <parameter name="TransducerRanges"/>
+   <parameter name="Plankton"/>
+   <parameter name="BroadbandNotchFilters"/>
+   <parameter name="PulseCompressionFilters"/>
+   <parameter name="BroadbandSplitterBands"/>
+   <parameter name="Towfish"/>
+</ConfigFiles>
