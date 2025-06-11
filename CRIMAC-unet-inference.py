@@ -3,6 +3,7 @@ import os
 import shutil
 import subprocess
 from pathlib import Path
+from src.predict import run_unet_inference
 
 # Print environment variables
 print('CRIMAC-classifiers-unet')
@@ -37,3 +38,10 @@ print(cmdstr)
 subprocess.run(cmdstr, check=True)
 
 # Do the Unet think on the nc file in scratch out
+run_unet_inference(
+    config="/src/configs/config_brautaset.yaml", 
+    checkpoint_path="/path/to/model",
+    device="cuda:0",
+    input_file=Path('/scratchout', filename),
+    output_file=Path('/dataout', filename.replace('.nc', '_predictions.nc')s
+)
