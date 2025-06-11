@@ -407,7 +407,7 @@ def load_pretrained(checkpoint_path, config, late_meta_inject=False):
             "Loading pretrained models with late meta injection is not implemented."
         )
     else:
-        model = UNet_Baseline(n_classes=len(config["model"]["classes"]),
+        model = UNet_Baseline(n_classes=len(config["model"]["categories"]),
                               in_channels=len(config["model"]["frequencies"]), 
                               late_meta_inject=False, 
                               depth=5, 

@@ -1,0 +1,11 @@
+## Config file for the brautset model
+
+description: "Using Sandeel U-Net model from 'Acoustic classification in multifrequency echosounder data using deep convolutional neural networks' by Brautaset et al. (2020)."
+
+model:
+  categories: [0, 27, 1]  # Background, Sandeel, Other
+  frequencies: [18000, 38000, 120000, 200000]
+  patch_size: [256, 256]
+  meta_channels: []  # No meta channels
+
+data_transforms: ['remove_nan_inf', 'db_with_limits', 'set_data_border_value']

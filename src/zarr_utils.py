@@ -36,12 +36,13 @@ def append_to_zarr(ds, target_dname, write_first_loop):
         ds.to_zarr(target_dname, append_dim="ping_time")
 
 
-def create_xarray_ds_predictions(reader, predictions, start_ping, end_ping, model_name):
+def create_xarray_ds_predictions(predictions, time_vector, range_vector, description):
     ds = xr.Dataset({"annotation": xr.DataArray(data=np.swapaxes(predictions, 1, 2),  # swap axes to match zarr
                                                 dims=["category", "ping_time", "range"],
                                                 coords={"category": [27, 1],
-                                                        "ping_time": reader.time_vector[start_ping:end_ping],
-                                                        "range": reader.range_vector})},
-                    attrs={"description": f"{model_name} predictions", 
+                                                        "ping_time": time_vector,
+                                                        "range": range_vector})},
+                    attrs={"description": description, 
                            "time": "{date:%Y-%m-%d %H:%M:%S}".format(date=datetime.datetime.now())}).astype(np.float16)
     return ds
+
