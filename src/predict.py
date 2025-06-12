@@ -4,6 +4,7 @@ Code to run U-Net inference on a single file
 import random
 import numpy as np
 import torch
+from tqdm import tqdm
 from torch.utils.data import DataLoader
 from unet import load_pretrained
 from data_transforms import get_data_transform_function
@@ -89,7 +90,6 @@ def run_unet_inference(config, checkpoint_path, device, input_file, output_file,
 
     # Fill inn parts of the output array at a time
     n_pings = dataset.num_pings
-    n_pings = 1000
 
     # Get dataset chunk size
     chunk_size = np.max(dataset.ds.chunksizes['ping_time'])
@@ -100,9 +100,8 @@ def run_unet_inference(config, checkpoint_path, device, input_file, output_file,
         split_size = (10000 // chunk_size) * chunk_size
 
     splits = get_data_split([[start_ping, n_pings]], split_size)  # Split into smaller portions to avoid memory issues
-    print(splits)
 
-    for (start_ping, end_ping) in splits:
+    for (start_ping, end_ping) in tqdm(splits, total=len(splits), desc="Predicting patches"):
         # Select area in dataset
         dataset.define_data_grid(start_ping=start_ping, end_ping=end_ping)
         dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers,

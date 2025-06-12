@@ -41,6 +41,10 @@ class DatasetGridded:
         
         self.num_pings = len(self.ds.ping_time)
         self.num_ranges = len(self.ds.range)
+        self.start_ping = None
+        self.end_ping = None
+        self.start_range = None
+        self.end_range = None
 
         self.window_size = np.array(window_size)
         self.frequencies = frequencies
@@ -51,11 +55,6 @@ class DatasetGridded:
 
         if len(self.meta_channels) > 0:
             raise NotImplementedError("Meta channels are not implemented yet")
-            # # Check valid meta_channels input
-            # assert all([isinstance(cond, bool) for cond in self.meta_channels.values()])
-            # assert set(self.meta_channels.keys()) == \
-            #        {'portion_year', 'portion_day', 'depth_rel', 'depth_abs_surface', 'depth_abs_seabed', 'time_diff'}
-
 
         # Initialize sampler
         self.data_grid = self.define_data_grid()
@@ -76,6 +75,11 @@ class DatasetGridded:
             end_ping = self.num_pings
         if end_range is None:
             end_range = self.num_ranges
+
+        self.start_ping = start_ping
+        self.end_ping = end_ping
+        self.start_range = start_range
+        self.end_range = end_range
 
         # Get grid with center point of all patches
         self.data_grid = get_data_grid(start_ping, end_ping, start_range, end_range,
@@ -116,8 +120,13 @@ class DatasetGridded:
         out_data[:, crop[0]:crop[1], crop[2]:crop[3]] = data
         
         # Label the parts that are outside the data range
+        label_crop_x = (max(x0, self.start_ping), min(x1, self.end_ping))
+        label_crop_y = (max(y0, self.start_range), min(y1, self.end_range))
+        label_crop = [label_crop_y[0] - y0, self.window_size[0] - (y1 - label_crop_y[1]),
+                label_crop_x[0] - x0, self.window_size[1] - (x1 - label_crop_x[1])]
+        
         out_labels = np.ones_like(out_data[0]) * LABEL_BOUNDARY_VAL
-        out_labels[crop[0]:crop[1], crop[2]:crop[3]] = 0
+        out_labels[label_crop[0]:label_crop[1], label_crop[2]:label_crop[3]] = 0
         
         return out_data, out_labels
 
