@@ -8,7 +8,7 @@ class DatasetGridded:
     """
     Grid a data reader, return regular gridded data patches
     """
-    def __init__(self, zarr_file,
+    def __init__(self, data_path,
                  window_size,
                  frequencies,
                  meta_channels=[],
@@ -29,11 +29,22 @@ class DatasetGridded:
         Raises:
             NotImplementedError: _description_
         """
+
+        # assert that data_path is either .zarr or .nc file
+        assert data_path.endswith('.zarr') or data_path.endswith('.nc'), \
+            f"Data path must be a .zarr or .nc file, got {data_path}"
         
-        assert os.path.isdir(zarr_file), \
-            f"Zarr file {zarr_file} does not exist. Please provide a valid zarr file."
         
-        self.ds = xr.open_zarr(zarr_file)
+        if data_path.endswith('.zarr'):
+            assert os.path.isdir(data_path), \
+                f"Zarr file {data_path} does not exist. Please provide a valid zarr file."
+            
+            self.ds = xr.open_zarr(data_path)
+        else:
+            assert os.path.isfile(data_path), \
+                f"NetCDF file {data_path} does not exist. Please provide a valid netCDF file."
+            
+            self.ds = xr.open_dataset(data_path)
 
         # assert that the frequencies in 'frequencies' are in the dataset
         assert all([f in self.ds.frequency for f in frequencies]), \
@@ -103,7 +114,6 @@ class DatasetGridded:
         # retrieve the data (making sure not to go out of bounds)
         zarr_crop_x = (max(x0, 0), min(x1, self.num_pings))
         zarr_crop_y = (max(y0, 0), min(y1, self.num_ranges))
-        
 
         # get the data, shape is (num_frequencies, num_pings, num_ranges)
         data = self.ds.sv.sel(frequency=self.frequencies)[:, zarr_crop_x[0]:zarr_crop_x[1],

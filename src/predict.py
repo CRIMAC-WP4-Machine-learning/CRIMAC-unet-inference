@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 from unet import load_pretrained
 from data_transforms import get_data_transform_function
 from dataset import DatasetGridded
-from zarr_utils import initialize_zarr_directory, append_to_zarr, create_xarray_ds_predictions
+from write_utils import initialize_dataset, append_to_dataset, create_xarray_ds_predictions
 from constants import LABEL_OVERLAP_VAL, LABEL_SEABED_MASK_VAL, LABEL_BOUNDARY_VAL, SANDEEL, OTHER
 from utils import read_config
 
@@ -61,7 +61,7 @@ def seed_worker(worker_id):
 
 
 def run_unet_inference(config, checkpoint_path, device, input_file, output_file, 
-                       batch_size=4, num_workers=4):
+                       batch_size=8, num_workers=8):
     """
     Run U-Net inference on a single file
     """
@@ -77,7 +77,7 @@ def run_unet_inference(config, checkpoint_path, device, input_file, output_file,
 
     # Set up dataset
     data_transform_function = get_data_transform_function(config['data_transforms'])
-    dataset = DatasetGridded(zarr_file=input_file,
+    dataset = DatasetGridded(data_path=input_file,
         window_size=config['model']['patch_size'],
         frequencies=config['model']['frequencies'],
         meta_channels=config['model']['meta_channels'],
@@ -86,18 +86,22 @@ def run_unet_inference(config, checkpoint_path, device, input_file, output_file,
         data_transform_function=data_transform_function)
 
     # Initialize output zarr file
-    start_ping, write_first_loop = initialize_zarr_directory(output_file, resume=False)
+    start_ping, write_first_loop = initialize_dataset(output_file, resume=False)
 
     # Fill inn parts of the output array at a time
     n_pings = dataset.num_pings
 
     # Get dataset chunk size
-    chunk_size = np.max(dataset.ds.chunksizes['ping_time'])
+    chunk_sizes = dataset.ds.chunksizes
+    if 'ping_time' in chunk_sizes:
+        ping_time_chunk_size = np.max(dataset.ds.chunksizes['ping_time'])
 
-    if chunk_size > 10000:
-        split_size = 10000
+        if ping_time_chunk_size > 10000:
+            split_size = 10000
+        else:
+            split_size = (10000 // ping_time_chunk_size) * ping_time_chunk_size
     else:
-        split_size = (10000 // chunk_size) * chunk_size
+        split_size = 10000
 
     splits = get_data_split([[start_ping, n_pings]], split_size)  # Split into smaller portions to avoid memory issues
 
@@ -137,15 +141,15 @@ def run_unet_inference(config, checkpoint_path, device, input_file, output_file,
                                           description=description)
 
         # Write to zarr
-        append_to_zarr(ds, output_file, write_first_loop)
+        append_to_dataset(ds, output_file, write_first_loop)
 
         write_first_loop = False
 
 
 if __name__ == "__main__":
     checkpoint_path = "/nr/project/bild/CRIMAC/Models/Olav_Unet_model.pt"
-    input_file = "/nr/bamjo/jodata5/pro/crimac/rechunked_data/2011/S2011206/ACOUSTIC/GRIDDED/S2011206_sv.zarr"
-    output_file = "S2011206_predictions.zarr"
+    input_file = "/nr/bamjo/jodata5/pro/crimac/data/2007/S2007205/ACOUSTIC/GRIDDED/sv/2007205-D20070505-T101116.nc"
+    output_file = "2007205-D20070505-T101116_pred.nc"
     config = "/nr/bamjo/user/utseth/crimac/code/CRIMAC-unet-inference/src/configs/config_brautaset.yaml"
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
