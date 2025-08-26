@@ -31,17 +31,18 @@ class DatasetGridded:
         """
 
         # assert that data_path is either .zarr or .nc file
-        assert data_path.endswith('.zarr') or data_path.endswith('.nc'), \
+        print('DataPath variable: '+str(data_path))
+        assert str(data_path).endswith('.zarr') or str(data_path).endswith('.nc'), \
             f"Data path must be a .zarr or .nc file, got {data_path}"
         
         
-        if data_path.endswith('.zarr'):
-            assert os.path.isdir(data_path), \
+        if str(data_path).endswith('.zarr'):
+            assert os.path.isdir(str(data_path)), \
                 f"Zarr file {data_path} does not exist. Please provide a valid zarr file."
             
             self.ds = xr.open_zarr(data_path)
         else:
-            assert os.path.isfile(data_path), \
+            assert os.path.isfile(str(data_path)), \
                 f"NetCDF file {data_path} does not exist. Please provide a valid netCDF file."
             
             self.ds = xr.open_dataset(data_path)

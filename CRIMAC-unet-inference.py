@@ -4,6 +4,7 @@ import shutil
 import subprocess
 from pathlib import Path
 from src.predict import run_unet_inference
+import torch
 
 # Print environment variables
 print('CRIMAC-classifiers-unet')
@@ -28,19 +29,33 @@ shutil.copy(
     Path('/scratchin', filename)
     )
 
-# Run korona on the single file
+# Run korona on the single file from the internal folder scratchin and write the
+# nc file to the external folder scratchnc
 cmdstr = ['/lsss-3.0.0/korona/KoronaCli.sh',
           'batch',
           '--cfs', '/app/CW.cfs',
-          '--destination', '/dataout', # Replace dataout with scratchout
+          '--destination', '/scratchnc',
           '--source', '/scratchin']
+
 print(cmdstr)
 subprocess.run(cmdstr, check=True)
 
-# Do the Unet think on the nc file in scratch out
+print('Content of scratchnc : '+str(os.listdir('/scratchnc/sv')))
+
+# Check for GPU device (should be changed to an ENV variable to enable any cuda device)
+if torch.cuda.is_available():
+    device = "cuda:0"
+else:
+    device = "cpu"
+
+print('Avilable device      : '+device)
+    
+# Run the inference code on the netcdf file in internal 'scratchnc' folder
 run_unet_inference(config="/app/src/configs/config_brautaset.yaml", 
-    checkpoint_path="/modelweights/Olav_Unet_model.pt",
-    device="cuda:0",
-    input_file=Path('/scratchout', filename),
-    output_file=Path('/dataout', filename.replace('.nc', '_predictions.nc'))
-    )
+                   checkpoint_path="/modelweights/Olav_Unet_model.pt",
+                   device=device,
+                   input_file=Path(
+                       '/scratchnc/sv', filename.split('.')[0]+'.nc'),
+                   output_file=Path(
+                       '/dataout', filename.replace('.nc', '_predictions.nc'))
+                   )

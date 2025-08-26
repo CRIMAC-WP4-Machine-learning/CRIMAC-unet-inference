@@ -1,5 +1,4 @@
 FROM python:3.11
-#FROM pytorch/pytorch:2.7.0-cuda11.8-cudnn9-runtime
 
 # Install linux libraries
 RUN apt-get update && apt-get install -y wget unzip libnetcdf-dev
@@ -37,6 +36,7 @@ COPY src /app/src/
 COPY Olav_Unet_model.pt /modelweights/Olav_Unet_model.pt 
 RUN mkdir /scratchin
 RUN mkdir /scratchout
+RUN mkdir /scratchnc
 
 WORKDIR /app
 

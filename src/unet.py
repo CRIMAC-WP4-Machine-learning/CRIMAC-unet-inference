@@ -391,7 +391,7 @@ class UNet_LateMetInject(UNet):
 
         return x
 
-def load_pretrained(checkpoint_path, config, late_meta_inject=False):
+def load_pretrained(checkpoint_path, config, late_meta_inject=False, map_location=torch.device('cpu')):
     """
     Load a pretrained model from a checkpoint.
     :param checkpoint_path: Path to the checkpoint file.
@@ -415,7 +415,7 @@ def load_pretrained(checkpoint_path, config, late_meta_inject=False):
                               start_filts=64, 
                               up_mode="transpose",
                               merge_mode="concat")
-        checkpoint = torch.load(checkpoint_path)
+        checkpoint = torch.load(checkpoint_path, map_location=torch.device('cpu'))
         model.load_state_dict(checkpoint)
         model.eval()
         return model
