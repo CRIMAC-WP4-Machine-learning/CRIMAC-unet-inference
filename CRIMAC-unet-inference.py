@@ -38,8 +38,8 @@ print(cmdstr)
 subprocess.run(cmdstr, check=True)
 
 # Do the Unet think on the nc file in scratch out
-run_unet_inference(config="/src/configs/config_brautaset.yaml", 
-    checkpoint_path="/path/to/model",
+run_unet_inference(config="/app/src/configs/config_brautaset.yaml", 
+    checkpoint_path="/modelweights/Olav_Unet_model.pt",
     device="cuda:0",
     input_file=Path('/scratchout', filename),
     output_file=Path('/dataout', filename.replace('.nc', '_predictions.nc'))

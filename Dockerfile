@@ -27,12 +27,14 @@ COPY CW.cfs /app/
 COPY TransducerRanges.xml /app/
 
 # Install python libraries & python code
-#COPY requirements.txt /requirements.txt
-#RUN pip install --no-cache-dir --upgrade pip && \
-#    pip install --no-cache-dir -r requirements.txt
+COPY requirements.txt /requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Prepare for running		
 COPY CRIMAC-unet-inference.py /app/CRIMAC-unet-inference.py
+COPY src /app/src/
+COPY Olav_Unet_model.pt /modelweights/Olav_Unet_model.pt 
 RUN mkdir /scratchin
 RUN mkdir /scratchout
 

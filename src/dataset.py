@@ -1,7 +1,7 @@
 import xarray as xr
 import numpy as np
 import os
-from constants import LABEL_BOUNDARY_VAL, LABEL_OVERLAP_VAL
+from src.constants import LABEL_BOUNDARY_VAL, LABEL_OVERLAP_VAL
 
 
 class DatasetGridded:

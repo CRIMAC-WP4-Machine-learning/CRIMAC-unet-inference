@@ -6,12 +6,12 @@ import numpy as np
 import torch
 from tqdm import tqdm
 from torch.utils.data import DataLoader
-from unet import load_pretrained
-from data_transforms import get_data_transform_function
-from dataset import DatasetGridded
-from write_utils import initialize_dataset, append_to_dataset, create_xarray_ds_predictions
-from constants import LABEL_OVERLAP_VAL, LABEL_SEABED_MASK_VAL, LABEL_BOUNDARY_VAL, SANDEEL, OTHER
-from utils import read_config
+from src.unet import load_pretrained
+from src.data_transforms import get_data_transform_function
+from src.dataset import DatasetGridded
+from src.write_utils import initialize_dataset, append_to_dataset, create_xarray_ds_predictions
+from src.constants import LABEL_OVERLAP_VAL, LABEL_SEABED_MASK_VAL, LABEL_BOUNDARY_VAL, SANDEEL, OTHER
+from src.utils import read_config
 
 
 def get_data_split(valid_pings_ranges, max_n_pings=1000):
@@ -66,6 +66,7 @@ def run_unet_inference(config, checkpoint_path, device, input_file, output_file,
     Run U-Net inference on a single file
     """
     # Read config yaml file
+    print(config)
     config = read_config(config)
     description = config['description']
     categories = [cat for cat in config['model']['categories'] if cat != 0] # Remove background category

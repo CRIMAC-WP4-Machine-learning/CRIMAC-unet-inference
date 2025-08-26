@@ -398,6 +398,7 @@ def load_pretrained(checkpoint_path, config, late_meta_inject=False):
     :param late_meta_inject: Boolean indicating if late meta injection is used.
     :return: The loaded model.
     """
+    print(checkpoint_path)
     assert os.path.exists(
         checkpoint_path
     ), f"Checkpoint file {checkpoint_path} does not exist."

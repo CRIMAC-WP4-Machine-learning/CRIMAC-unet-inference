@@ -18,6 +18,7 @@ Run `python3 run_test.py`. Use the script as a starting point for further implem
 Mandatory parameters are `-v $datain:/datain`, `-v $dataout:/dataout` and the file name to be 
 processed coded as an env variable: `--env FILE_NAME=$filename`.
 
+## Model weights
+Currently the model weights have to be copied to the build directory of the Docker image.
 
-
-
+Download the model weights from [S3](https://s3browser.hi.no/files/crimac/modelweights/) and store in the build direcotry.
