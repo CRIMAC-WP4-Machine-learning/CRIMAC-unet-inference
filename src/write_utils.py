@@ -25,7 +25,7 @@ def initialize_dataset(target_dname, resume):
             print(f"Found zarr directory at {target_dname}")
             write_first_loop = False
             start_ping = xr.open_zarr(target_dname).sizes['ping_time']
-        elif os.path.split(target_dname)[-1].endswith('.nc'):
+        elif os.path.split(str(target_dname))[-1].endswith('.nc'):
             print(f"Found netCDF file at {target_dname}")
             write_first_loop = False
             start_ping = xr.open_dataset(target_dname).ping_time.size
@@ -46,7 +46,7 @@ def append_to_dataset(ds, target_dname, write_first_loop):
             ds.to_zarr(target_dname, mode="w", encoding=encoding)
         else:
             ds.to_zarr(target_dname, append_dim="ping_time")
-    elif target_dname.endswith('.nc'):
+    elif str(target_dname).endswith('.nc'):
         # For netCDF, we need to ensure the data is in float32 format
         ds["annotation"] = ds["annotation"].astype('float32')
         if write_first_loop:
