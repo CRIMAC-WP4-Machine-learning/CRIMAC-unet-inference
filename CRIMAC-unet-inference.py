@@ -37,7 +37,6 @@ cmdstr = ['/lsss-3.0.0/korona/KoronaCli.sh',
           '--destination', '/scratchnc',
           '--source', '/scratchin']
 
-print(cmdstr)
 subprocess.run(cmdstr, check=True)
 
 print('Content of scratchnc : '+str(os.listdir('/scratchnc/sv')))
@@ -49,13 +48,14 @@ else:
     device = "cpu"
 
 print('Avilable device      : '+device)
-    
+output_file = Path('/dataout', filename.replace('.raw', '_predictions.nc'))
+print('Output file          : '+str(output_file))
+
 # Run the inference code on the netcdf file in internal 'scratchnc' folder
 run_unet_inference(config="/app/src/configs/config_brautaset.yaml", 
                    checkpoint_path="/modelweights/Olav_Unet_model.pt",
                    device=device,
                    input_file=Path(
                        '/scratchnc/sv', filename.split('.')[0]+'.nc'),
-                   output_file=Path(
-                       '/dataout', filename.replace('.nc', '_predictions.nc'))
+                   output_file=output_file
                    )

@@ -27,11 +27,14 @@ for _test_data in test_data[0:1]:
     
     # List the test data files and run file by file
     files = [item for item in datain.rglob('*.raw') if item.is_file()]
-
+    print('dataout :'+str(dataout))
+    print('datain  :'+str(datain))
+    
     for _file in files:
         
         command = [
             "docker", "run", "-it", "--rm",
+            "--shm-size=1g",
             "-v", str(datain)+':/datain',
             "-v", str(dataout)+':/dataout',
             "--security-opt", "label=disable",
